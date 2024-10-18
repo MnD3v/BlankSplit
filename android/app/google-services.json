@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "639811708002",
+    "project_id": "meloger-a0927",
+    "storage_bucket": "meloger-a0927.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639811708002:android:769d6ea60e89e104945d3b",
+        "android_client_info": {
+          "package_name": "com.equilibre.immobilier_apk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBR5Y8VuXB4Y57nFiIZA_Pqy9-HiUOF8aU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
