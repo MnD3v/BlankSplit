@@ -1,8 +1,10 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdf_text/flutter_pdf_text.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:immobilier_apk/scr/ui/pages/historique.dart';
+import 'package:immobilier_apk/scr/ui/pages/view_pdf.dart';
 import 'package:my_widgets/my_widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf_manipulator/pdf_manipulator.dart';
@@ -39,8 +41,8 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         title: Image(
-          image: AssetImage("assets/images/logo.png"),
-          height: 22,
+          image: AssetImage("assets/icons/launcher_icon.png"),
+          height: 55,
         ),
         actions: [
           IconButton(
@@ -177,72 +179,92 @@ class _HomePageState extends State<HomePage> {
                   size: 24,
                   weight: FontWeight.bold,
                 ),
-                file == null
-                    ? Center(
-                        child: Column(
+                AnimatedSwitcher(
+                  duration: 666.milliseconds,
+                  child: file == null
+                      ? Center(
+                          child: Column(
+                            children: [
+                              Image(
+                                image: AssetImage("assets/icons/aucun.png"),
+                                height: 96,
+                              ),
+                              6.h,
+                              EText(
+                                "Aucun document selectionné",
+                                color: Colors.grey,
+                              )
+                            ],
+                          ),
+                        )
+                      : Column(
                           children: [
-                            Image(
-                              image: AssetImage("assets/icons/aucun.png"),
-                              height: 96,
+                            GestureDetector(
+                              onTap: (){
+                                Get.to(ViewPdf(path: file!.path, dossier: dossier, nommage: nommage,));
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 9),
+                                decoration: BoxDecoration(
+                                    color: Colors.red.withOpacity(.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: Colors.red)),
+                                child: Row(
+                                  children: [
+                                    Image(
+                                      image: AssetImage("assets/icons/pdf.png"),
+                                      height: 40,
+                                    ),
+                                    6.w,
+                                    SizedBox(
+                                        width: Get.width - 90,
+                                        child: EText(file!.path)),
+                                  ],
+                                ),
+                              ),
                             ),
-                            6.h,
-                            EText(
-                              "Aucun document selectionné",
-                              color: Colors.grey,
+                            12.h,
+                            GestureDetector(
+                              onTap: () async {
+                                loading(
+                                    progress: Obx(() => EText(progress.value)));
+
+                                splitPdf();
+                              },
+                              child: Container(
+                                width: Get.width,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.teal,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                alignment: Alignment.center,
+                                child: EText(
+                                  "Traiter Automatiquement",
+                                  color: Colors.white,
+                                  weight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            9.h,
+                            SimpleButton(
+                              radius: 6,
+                              color: Colors.blue,
+                              onTap: () {
+                                                                Get.to(ViewPdf(path: file!.path, dossier: dossier, nommage: nommage,));
+
+                           
+                              },
+                              child: EText(
+                                "Traiter Manuellement",
+                                color: Colors.white,
+                                weight: FontWeight.w800,
+                              ),
                             )
                           ],
                         ),
-                      )
-                    : Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 9),
-                            decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(.1),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: Colors.red)),
-                            child: Row(
-                              children: [
-                                Image(
-                                  image: AssetImage("assets/icons/pdf.png"),
-                                  height: 40,
-                                ),
-                                6.w,
-                                SizedBox(
-                                    width: Get.width - 90,
-                                    child: EText(file!.path)),
-                              ],
-                            ),
-                          ),
-                          12.h,
-                          GestureDetector(
-                            onTap: () async {
-                     
-                                loading(
-                                    progress: Obx(() => EText(progress.value)));
-                                    
-                               splitPdf();
-                                
-                              // Get.back();
-                            },
-                            child: Container(
-                              width: Get.width,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.teal,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              alignment: Alignment.center,
-                              child: EText(
-                                "Traiter",
-                                color: Colors.white,
-                                weight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                        ],
-                      )
+                )
               ],
             ),
             48.h,
@@ -290,9 +312,8 @@ class _HomePageState extends State<HomePage> {
     if (simple) {
       int initalPage = 1;
       for (int i = 1; i <= doc.length; i++) {
-  
-          progress.value = i.toString() + '/' + doc.length.toString();
-      
+        progress.value = i.toString() + '/' + doc.length.toString();
+
         print(i);
         String content = "";
         try {
@@ -303,20 +324,19 @@ class _HomePageState extends State<HomePage> {
           String sep = initalPage.toString() + "-" + (i - 1).toString();
           separates.add(sep);
           initalPage = i + 1;
-          print("😍👍🔥🫶🫡");
         }
       }
 
       if (initalPage <= doc.length) {
+        print("initial depasse");
         separates.add(initalPage.toString() + "-" + doc.length.toString());
       }
+      print("end");
     } else {
       int initalPage = 1;
       int first_blank = 0;
       for (int i = 1; i <= doc.length; i++) {
-   
-          progress.value = i.toString() + '/' + doc.length.toString();
-  
+        progress.value = i.toString() + '/' + doc.length.toString();
 
         print(i);
         String content = "";
@@ -329,7 +349,6 @@ class _HomePageState extends State<HomePage> {
             String sep = initalPage.toString() + "-" + (i - 2).toString();
             separates.add(sep);
             initalPage = i + 1;
-            print("😍👍🔥🫶🫡");
           }
           first_blank = i;
         }
@@ -340,12 +359,15 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
+    progress.value = "Splitting...";
+
     List<String>? splitPdfPaths = await PdfManipulator().splitPDF(
       params: PDFSplitterParams(pdfPath: file!.path, pageRanges: separates),
     );
+    progress.value = "Saving...";
+
+    await saveToPublicDocuments(splitPdfPaths!);
     separates.clear();
-    saveToPublicDocuments(splitPdfPaths!);
-    Get.back();
   }
 
   Future<void> requestStoragePermission() async {
@@ -358,17 +380,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> saveToPublicDocuments(List<String> tempsPaths) async {
-    // Demander la permission d'accéder au stockage externe
     var status = await Permission.storage.request();
 
     if (status.isGranted) {
-      // Accéder directement au répertoire public Documents
       String externalDocumentsDir =
           '/storage/emulated/0/Documents/Archivage_UGP-AK/$dossier';
 
       Directory newFolder = Directory(externalDocumentsDir);
 
-      // Créer le dossier s'il n'existe pas
       if (!await newFolder.exists()) {
         await newFolder.create(recursive: true);
         print('Dossier créé à : $externalDocumentsDir');
@@ -376,27 +395,33 @@ class _HomePageState extends State<HomePage> {
         print('Le dossier existe déjà à : $externalDocumentsDir');
       }
 
-      // Copier les fichiers
-      for (var element in tempsPaths) {
-        var file = File(element);
+      print("Save start");
 
-        // Générer un nom unique pour chaque fichier
-        String newFilePath = '$externalDocumentsDir/$nommage' +
+      for (var i = 0; i < tempsPaths.length; i++) {
+        var temp_file = File(tempsPaths[i]);
+
+        String newFilePath = '$externalDocumentsDir/' +
+            separates[i] +
+            '_$nommage' +
+            '_${file!.uri.pathSegments.last.split(".").first}' +
             '_' +
             '${DateTime.now().millisecondsSinceEpoch}.pdf';
 
-        // Copier le fichier
         try {
-          await file.copy(newFilePath);
+          await temp_file.copy(newFilePath);
           print('Fichier copié à : $newFilePath');
         } catch (e) {
           print('Erreur lors de la copie du fichier : $e');
         }
       }
+      print("Save end");
+
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final List<String> doneFiles = prefs.getStringList('doneFiles') ?? [];
-      doneFiles.add(file!.path + "***" + dossier+"***"+DateTime.now().toString());
+      doneFiles.add(
+          file!.path + "***" + dossier + "***" + DateTime.now().toString());
       await prefs.setStringList('doneFiles', doneFiles);
+      Get.back();
       Custom.showDialog(WillPopScope(
         onWillPop: () async {
           Get.back();
@@ -416,9 +441,17 @@ class _HomePageState extends State<HomePage> {
                   height: 88,
                 ),
                 12.h,
-                EText("Document traité avec succès", weight: FontWeight.bold,),
-                ETextRich(textSpans: [ETextSpan(text: 'Traitement enregistré dans '), ETextSpan(text: "/Documents/Archivage_UGP-AK/$dossier/", color: Colors.red)])
-               , 12.h,
+                EText(
+                  "Document traité avec succès",
+                  weight: FontWeight.bold,
+                ),
+                ETextRich(textSpans: [
+                  ETextSpan(text: 'Traitement enregistré dans '),
+                  ETextSpan(
+                      text: "/Documents/Archivage_UGP-AK/$dossier/",
+                      color: Colors.red)
+                ]),
+                12.h,
                 SimpleButton(
                     onTap: () {
                       Get.back();
@@ -441,4 +474,5 @@ class _HomePageState extends State<HomePage> {
       print('Permission de stockage refusée');
     }
   }
+
 }

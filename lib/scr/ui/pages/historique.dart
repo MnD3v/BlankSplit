@@ -51,7 +51,7 @@ class _HistoriqueState extends State<Historique> {
                   ]),
               )
               : EColumn(
-                  children: doneFiles.map((element) {
+                  children: doneFiles.reversed .map((element) {
                   return Container(
                     margin: EdgeInsets.symmetric(vertical: 6),
                     padding: EdgeInsets.symmetric(vertical: 18, horizontal: 12),

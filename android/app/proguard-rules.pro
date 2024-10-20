@@ -1,0 +1,2 @@
+-keep public class com.itextpdf.**
+-keep public class org.apache.**
